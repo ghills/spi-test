@@ -17,12 +17,12 @@
 // $Id: RF22.h,v 1.21 2012/05/30 01:51:25 mikem Exp $
 #include <bcm2835.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <unistd.h>
 
 int main(int argc, char **argv)
 {
     uint8_t cnt;
+    char c;
 
     // If you call this, it will not actually access the GPIO
     // Use for testing
@@ -41,15 +41,18 @@ int main(int argc, char **argv)
     // If you tie MISO to MOSI, you should read back what was sent
     //uint8_t data = bcm2835_spi_transfer(0x69);
     //printf("Read from SPI: %02X\n", data);
-    
-    srandom(31415926);
-   
+
     cnt = 0;
     while( cnt <= 255 )
         {
-        bcm2835_spi_transfer(cnt);
-        cnt = random() % 256;
-        sleep(1);
+        c = getchar();
+        if( c != 10 )
+            {
+            // not the CR
+            bcm2835_spi_transfer( c );
+            cnt++;
+            sleep(1);
+            }
         }
 
     bcm2835_spi_end();
